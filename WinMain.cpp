@@ -1,4 +1,19 @@
 ﻿#include <Windows.h>
+#include "WindowsMessageLogger.h"
+
+LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	static WindowsMessageLogger ML;
+	OutputDebugString(ML(msg, lParam, wParam).c_str());
+
+	switch (msg)
+	{
+	case WM_CLOSE:
+		PostQuitMessage(0);
+		break;
+	}
+	return DefWindowProc(hWnd, msg, wParam, lParam);
+}
 
 int WINAPI WinMain(_In_		HINSTANCE hInstance,
 				   _In_opt_	HINSTANCE hPrevInstance,
@@ -11,16 +26,18 @@ int WINAPI WinMain(_In_		HINSTANCE hInstance,
 	WNDCLASSEX Wc = { 0 };
 	Wc.cbSize = sizeof(Wc);
 	Wc.style = CS_OWNDC;
-	Wc.lpfnWndProc = DefWindowProc;
+	Wc.lpfnWndProc = WndProc;
 	Wc.cbClsExtra = 0;
 	Wc.cbWndExtra = 0;
 	Wc.hInstance = hInstance;
 	Wc.hIcon = nullptr;
-	Wc.hCursor = nullptr;
+	Wc.hCursor = nullptr;		
 	Wc.hbrBackground = nullptr;
 	Wc.lpszMenuName = nullptr;
 	Wc.lpszClassName = pClassName;
 	Wc.hIconSm = nullptr;
+	
+	
 	
 	RegisterClassEx(&Wc);
 	
@@ -28,13 +45,26 @@ int WINAPI WinMain(_In_		HINSTANCE hInstance,
 	HWND hWnd = CreateWindowExW(
 		0, pClassName, L"This is a window", 
 		WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
-		200, 200, 800, 600,
+		200, 200, 800, 600,	
 		nullptr, nullptr, hInstance, nullptr
 	);
 
 	ShowWindow(hWnd, SW_SHOW);
 
-	while (true);
+	MSG Msg;
+	BOOL gResult;
 
-	return 0;
+	while (gResult = (GetMessage(&Msg, nullptr, 0, 0)) > 0)
+	{
+		TranslateMessage(&Msg);
+		DispatchMessageW(&Msg);
+	}
+
+	if (gResult == -1)
+	{
+		return - 1;
+	}
+
+	return Msg.wParam;
 }
+
