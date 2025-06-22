@@ -1,8 +1,10 @@
 ﻿#pragma once
 
+#include "Win.h" 
+
 #include <string>
 #include <unordered_map>
-#include <Windows.h>
+
 
 // Using this class to get an idea of which Windows messages I need to handle
 class WindowsMessageLogger

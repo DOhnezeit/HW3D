@@ -1,5 +1,25 @@
-﻿#include <Windows.h>
+﻿#include "Win.h" 
+
 #include "WindowsMessageLogger.h"
+#include <iostream>
+#include <sstream>
+
+void OnKeyPress(HWND hWnd, WPARAM wParam)
+{
+	static std::wstring title;
+
+	if (wParam == VK_BACK)
+	{
+		if (!title.empty())
+			title.pop_back();
+	}
+	else if (wParam >= L' ' && wParam != 0x7F) // Filter out control chars and DEL
+	{
+		title.push_back(static_cast<wchar_t>(wParam));
+	}
+
+	SetWindowText(hWnd, title.c_str());
+}
 
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -9,9 +29,32 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	switch (msg)
 	{
 	case WM_CLOSE:
-		PostQuitMessage(0);
+		{
+			PostQuitMessage(0);
+		}
+		break;
+	case WM_KEYDOWN:
+		if (wParam == 'F')
+		{
+			SetWindowText(hWnd, L"You pressed F");
+		}
+		break;
+	case WM_CHAR:
+		{
+			OnKeyPress(hWnd, wParam);
+		}
+		break;
+	case WM_LBUTTONDOWN:
+		{
+			POINTS pt = MAKEPOINTS(lParam);
+			std::wostringstream oss;
+			oss << "(" << pt.x << "," << pt.y << ")";
+			std::wstring text = oss.str();
+			SetWindowText(hWnd, text.c_str());
+		}
 		break;
 	}
+
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 

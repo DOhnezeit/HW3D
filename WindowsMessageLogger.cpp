@@ -1,6 +1,7 @@
-﻿#include "WindowsMessageLogger.h"
+﻿#include "Win.h" 
 
-#include <Windows.h>
+#include "WindowsMessageLogger.h"
+
 #include <string>
 #include <sstream>
 #include <iomanip>
