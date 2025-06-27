@@ -1,8 +1,10 @@
 ﻿#include "Win.h" 
 
 #include "WindowsMessageLogger.h"
-#include <iostream>
+#include "Window.h"
+
 #include <sstream>
+#include <string>
 
 void OnKeyPress(HWND hWnd, WPARAM wParam)
 {
@@ -63,51 +65,21 @@ int WINAPI WinMain(_In_		HINSTANCE hInstance,
 				   _In_ LPSTR lpCmdLine,
 				   _In_ int nCmdShow)
 {
-	const LPCWSTR pClassName = L"HW3D";
-
-	// Register window class
-	WNDCLASSEX Wc = { 0 };
-	Wc.cbSize = sizeof(Wc);
-	Wc.style = CS_OWNDC;
-	Wc.lpfnWndProc = WndProc;
-	Wc.cbClsExtra = 0;
-	Wc.cbWndExtra = 0;
-	Wc.hInstance = hInstance;
-	Wc.hIcon = nullptr;
-	Wc.hCursor = nullptr;		
-	Wc.hbrBackground = nullptr;
-	Wc.lpszMenuName = nullptr;
-	Wc.lpszClassName = pClassName;
-	Wc.hIconSm = nullptr;
+	Window Wnd(800, 600, L"This is a window!");
 	
-	
-	
-	RegisterClassEx(&Wc);
-	
-	// Create window instance
-	HWND hWnd = CreateWindowExW(
-		0, pClassName, L"This is a window", 
-		WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
-		200, 200, 800, 600,	
-		nullptr, nullptr, hInstance, nullptr
-	);
-
-	ShowWindow(hWnd, SW_SHOW);
-
-	MSG Msg;
+	MSG msg;
 	BOOL gResult;
-
-	while (gResult = (GetMessage(&Msg, nullptr, 0, 0)) > 0)
+	while ((gResult = GetMessage(&msg, nullptr, 0, 0)) > 0)
 	{
-		TranslateMessage(&Msg);
-		DispatchMessageW(&Msg);
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
 	}
 
 	if (gResult == -1)
 	{
-		return - 1;
+		return -1;
 	}
 
-	return Msg.wParam;
+	return msg.wParam;
 }
 

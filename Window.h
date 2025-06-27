@@ -1,11 +1,26 @@
 ﻿#pragma once
 #include "Win.h"
-
+#include "CustomException.h"
 
 
 class Window
 {
-private:
+public:
+	class WindowException : public CustomException
+	{
+	public:
+		WindowException(int line, const char* file, HRESULT hr) noexcept;
+		const char* what() const noexcept override;
+		virtual const char* GetType() const noexcept;
+		static std::string TranslateErrorCode(HRESULT hr);
+		HRESULT GetErrorCode() const noexcept;
+		std::string GetErrorString() const noexcept;
+	private:
+		HRESULT hr;
+	};
+
+
+private: 
 	class WindowClass
 	{
 	public:
@@ -30,10 +45,12 @@ public:
 	Window& operator=(const Window&) = delete;
 private:
 	static LRESULT WINAPI HandleMessageSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-	static LRESULT WINAPI HandleMessageThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	static LRESULT WINAPI HandleMessageRedirect(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	LRESULT HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	int Width;
 	int Height;
 	HWND hWnd;
 };
 
+#define WND_EXCEPT(hr) Window::WindowException(__LINE__, __FILE__, hr)
